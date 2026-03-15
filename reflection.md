@@ -10,7 +10,7 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 
 It's a number guesser game that gives me 7 attempts to guess the number between 1 and 100. I started with 5 and made it to 99 where all the prompts said "Go HIGHER!", I guess 100 and it said "Go LOWER!". So I tried decimal numbers and of course was all over the place, ultimately running out of guesses. It turns out the secret number was 16, and I got a score of -5 instead of what I am assuming should have been 0.
 
-Looking back a week later, I noticed more bugs that I hadn't noticed the first week. I suppose I didn't do a well job finding bugs the first time around.
+Looking back a week later, I noticed more bugs that I hadn't noticed the first week. I suppose I didn't do a well job finding bugs the first time around. I found improper indexing of attempts seen in the debugging of the app, and a bug with using the 'enter' input to submit guesses.
 ---
 
 ## 2. How did you use AI as a teammate?
@@ -50,7 +50,7 @@ I used Claude within the terminal. I actually just asked Claude to open the refl
   and what it showed you about your code.
 - Did AI help you design or understand any tests? How?
 
-A bug was really fixed when the app no longer presented the initial break in logic. I was not aware before of pytest. I was manualling reruninng Streamlit and testing the app, which I guess is the slow way. I later had Claude generate a pytest to test the app.
+A bug was really fixed when the app no longer presented the initial break in logic. I was not aware before of pytest. I was manualling reruninng Streamlit and testing the app, which I guess is the slow way. For example, testing that number of attempts for each new game was properly index. I later had Claude generate a pytest to test the app.
 
 ---
 
@@ -61,6 +61,8 @@ A bug was really fixed when the app no longer presented the initial break in log
 - What change did you make that finally gave the game a stable secret number?
 
 ---
+From my understanding, Streamlit reruns the entire scripts from top to bottom for every user input, that's why the secret number would always generate a new number, thus the player would never guess the same secret number within the same game session. For Streamlit "reruns", think of it as re-reading your python script from scratch everytime it detects a user input and session state as storage for Streamlit so that it keeps track of every updated variable, user input, and data across al reruns. Additionally, the way Streamlit rereads is top to bottom, always. To keep a stable secret number, there was a code that on even-numbered attempts it would be converted to a string, and this broke comparisons, take for example the guess 50, 50 != "50".
+
 
 ## 5. Looking ahead: your developer habits
 
@@ -69,4 +71,4 @@ A bug was really fixed when the app no longer presented the initial break in log
 - What is one thing you would do differently next time you work with AI on a coding task?
 - In one or two sentences, describe how this project changed the way you think about AI generated code.
 
-Using detailed prompt sometimes the reponse fell short and required additional prompts if I wasn't specific. I would stop trying to fix 1 bug at a time and try fixing the bugs all at once with a detailed prompt, the amounts of prompts I made increased depending on the specificity, and question decisions/suggestions made.
+Using detailed prompt sometimes the reponse fell short and required additional prompts if I wasn't specific. I would stop trying to fix 1 bug at a time and try fixing the bugs all at once with a detailed prompt, the amounts of prompts I made increased depending on the specificity, and question decisions/suggestions made. I have used AI before for coding and have used strategies used in class before, such as having a detailed prompt/ explanation of your understanding of the issue with a bug instead of entering a "fix this" prompt. This project has taught me the good practice of documenting changes made with AI generated code.
