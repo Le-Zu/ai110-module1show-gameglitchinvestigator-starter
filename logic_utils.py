@@ -58,14 +58,17 @@ def check_guess(guess, secret):
 def update_score(current_score: int, outcome: str, attempt_number: int):
     """Update score based on outcome and attempt number."""
     if outcome == "Win":
-        points = 100 - 10 * (attempt_number + 1)
+        points = 100 - 10 * (attempt_number - 1)
         if points < 10:
             points = 10
         return current_score + points
 
-    if outcome == "Too High": # FIXME: Logic break, no point point should be rewared and even/odd number check should be removed, as supposed by Claud and verified by me
-        return current_score - 5
-    if outcome == "Too Low": # FIXME: Logic break, no point rewared for quessing right as supposed by Claude and verified by me
-        return current_score - 5
+    # FIXME (fixed): Wrong guesses were deducting 5 points each, causing negative scores
+    # even on early wins (e.g. 6 wrong guesses = -30, then win on attempt 7 = +20 → net -10).
+    # Wrong guesses should not deduct points — the win formula already penalizes extra attempts.
+    if outcome == "Too High":
+        return current_score
+    if outcome == "Too Low":
+        return current_score
 
     return current_score

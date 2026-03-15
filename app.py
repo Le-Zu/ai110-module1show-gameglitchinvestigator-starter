@@ -30,8 +30,11 @@ st.sidebar.caption(f"Attempts allowed: {attempt_limit}")
 if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
+# FIXME (fixed): attempts was initialized to 1 instead of 0, causing the first load
+# to show one fewer attempt than allowed (e.g. 7 instead of 8 for Normal difficulty).
+# New Game correctly reset to 0, so only the initial page load was affected.
 if "attempts" not in st.session_state:
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
 
 if "score" not in st.session_state:
     st.session_state.score = 0
@@ -49,19 +52,19 @@ st.info(
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
 
-with st.expander("Developer Debug Info"):
-    st.write("Secret:", st.session_state.secret)
-    st.write("Attempts:", st.session_state.attempts)
-    st.write("Score:", st.session_state.score)
-    st.write("Difficulty:", difficulty)
-    st.write("History:", st.session_state.history)
+# FIXME (fixed): attempts increment happened after the display block, so the
+# "Attempts left" counter was always one step behind — the display rendered with
+# the old value before the increment ran, giving the player an extra free attempt.
+# Using on_click ensures the increment fires before the script re-renders.
+def _increment_attempts():
+    st.session_state.attempts += 1
 
 with st.form("guess_form"):
     raw_guess = st.text_input( # FIXME, found by me where enter din't submit guess.
         "Enter your guess:",
         key=f"guess_input_{difficulty}"
     )
-    submit = st.form_submit_button("Submit Guess 🚀")
+    submit = st.form_submit_button("Submit Guess 🚀", on_click=_increment_attempts)
 col2, col3 = st.columns(2)
 with col2:
     new_game = st.button("New Game 🔁")
@@ -70,6 +73,7 @@ with col3:
 
 if new_game: # FIXME, another issue found me, and suggested fix by claud to update status, and add history reset
     st.session_state.attempts = 0
+    st.session_state.score = 0
     st.session_state.status = "playing"
     st.session_state.history = []
     st.session_state.secret = random.randint(1, 100)
@@ -84,8 +88,6 @@ if st.session_state.status != "playing":
     st.stop()
 
 if submit:
-    st.session_state.attempts += 1
-
     ok, guess_int, err = parse_guess(raw_guess)
 
     if not ok:
@@ -125,6 +127,17 @@ if submit:
                     f"The secret was {st.session_state.secret}. "
                     f"Score: {st.session_state.score}"
                 )
+
+# FIXME (fixed): Debug info was rendered before the if submit: block, so history
+# never included the current guess — the first guess never appeared, and each
+# subsequent guess showed the previous one at index 0. Moved the expander to
+# after the submit block so all session state reflects the current guess.
+with st.expander("Developer Debug Info"):
+    st.write("Secret:", st.session_state.secret)
+    st.write("Attempts:", st.session_state.attempts)
+    st.write("Score:", st.session_state.score)
+    st.write("Difficulty:", difficulty)
+    st.write("History:", st.session_state.history)
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")

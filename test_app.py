@@ -89,13 +89,13 @@ def test_update_score_win_minimum_points():
     score = update_score(0, "Win", 10)
     assert score == 10
 
-def test_update_score_too_high_deducts():
+def test_update_score_too_high_no_deduction():
     score = update_score(100, "Too High", 1)
-    assert score == 95
+    assert score == 100
 
-def test_update_score_too_low_deducts():
+def test_update_score_too_low_no_deduction():
     score = update_score(100, "Too Low", 1)
-    assert score == 95
+    assert score == 100
 
 def test_update_score_unknown_outcome_unchanged():
     score = update_score(100, "SomeOtherOutcome", 1)
