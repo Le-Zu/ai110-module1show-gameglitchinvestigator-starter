@@ -25,13 +25,39 @@ It wrote the code, ran away, and now the game is unplayable.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+### Game Purpose
+A number guessing game built with Streamlit where the player tries to guess a secret number within a limited number of attempts. Three difficulty levels (Easy, Normal, Hard) control the number range and attempt limit. Each correct guess awards points based on how few attempts were used.
+
+### Bugs Found
+
+| Bug | Location | Description |
+|-----|----------|-------------|
+| Backwards hints | `check_guess` | "Go HIGHER!" and "Go LOWER!" were swapped — hints sent players in the wrong direction |
+| Secret cast to string on even attempts | `app.py` | On every even-numbered attempt, the secret was silently converted to a string, breaking numeric comparison (e.g. `"100" < "16"` alphabetically) |
+| Wrong guesses deducted points | `update_score` | "Too High" and "Too Low" outcomes each deducted 5 points, causing negative scores before a win could recover them |
+| Score formula off by 2 | `update_score` | Formula used `attempt_number + 1` instead of `attempt_number - 1`, under-rewarding every win by 20 points |
+| Score not reset on new game | `app.py` | Starting a new game preserved the previous score, causing points to accumulate across sessions |
+| Attempts initialized to 1 | `app.py` | First page load showed one fewer attempt remaining than the difficulty allowed |
+| Attempt counter one step behind | `app.py` | Counter incremented after the display rendered, so the "Attempts left" value was always stale by one |
+| Debug info rendered too early | `app.py` | Developer Debug Info block rendered before guess processing, so history never showed the current guess — the first guess never appeared |
+| Enter key didn't submit | `app.py` | Text input was outside a `st.form`, so pressing Enter had no effect |
+
+### Fixes Applied
+
+- Removed the `str()` cast on even attempts so comparisons are always numeric
+- Removed 5-point deductions for wrong guesses; the win formula already penalizes extra attempts
+- Fixed score formula from `100 - 10 * (attempt_number + 1)` to `100 - 10 * (attempt_number - 1)`
+- Added `st.session_state.score = 0` to the new game handler
+- Changed attempts initialization from `1` to `0`
+- Moved attempt increment to `on_click=_increment_attempts` on the submit button so it fires before the script rerenders
+- Moved the Developer Debug Info expander to after the `if submit:` block so all session state reflects the current guess
+- Wrapped the text input in `st.form` so pressing Enter submits the guess
 
 ## 📸 Demo
 
-- [ ] [Insert a screenshot of your fixed, winning game here]
+### Pytest Results — 22 Tests Passing
+
+![pytest results showing 22 passed tests](image.png)
 
 ## 🚀 Stretch Features
 

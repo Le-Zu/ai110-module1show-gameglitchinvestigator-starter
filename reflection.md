@@ -21,6 +21,8 @@ Looking back a week later, I noticed more bugs that I hadn't noticed the first w
 
 I used Claude within the terminal. I actually just asked Claude to open the reflection.md and it offered to help me fill the questions out, I then answered #1 with my own words of what the app was and bugs I noticed. Claude suggested some lines that could be related to my observation, also giving an explanation to what logically went wrong with my guess. So I went and verified these explanations with the provided line numbers and referenced functions. There were other issue I found along the way as I checked the previous issues, that I didn't find the first time.
 
+Claude also suggested to remove the "stale" #FIXME comments, but I instructed Claude to keep it.
+
 "(check_guess, lines 37–39), (lines 158–161), "update_score (lines 57–63)". Also below I provided the full offered response block from Claude.
 
 "● Now I can see exactly what caused your experience. Here's a draft for section 1:
