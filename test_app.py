@@ -2,8 +2,12 @@ import pytest
 from unittest.mock import MagicMock
 import sys
 
+#FIXME missing code for Mock streamlit before importing. A return value so the difficulty dict lookup gets a real string
 # Mock streamlit before importing app so the st.* calls at module level don't crash
-sys.modules["streamlit"] = MagicMock()
+mock_st = MagicMock()
+mock_st.sidebar.selectbox.return_value = "Normal"
+mock_st.columns.return_value = (MagicMock(), MagicMock())
+sys.modules["streamlit"] = mock_st
 
 from app import parse_guess, check_guess, update_score, get_range_for_difficulty
 
