@@ -34,32 +34,29 @@ def check_guess(guess, secret):
         return "Win", "🎉 Correct!"
 
     try:
-        if guess > secret:
-            return "Too High", "📈 Go HIGHER!"
+        if guess > secret: # FIXME: Logic break here, should be "<" as supposed by Claude and comments are contradictory as found and verified by me
+            return "Too High", "📉 Go LOWER!"
         else:
-            return "Too Low", "📉 Go LOWER!"
+            return "Too Low", "📈 Go HIGHER!"
     except TypeError:
         g = str(guess)
         if g == secret:
             return "Win", "🎉 Correct!"
         if g > secret:
-            return "Too High", "📈 Go HIGHER!"
-        return "Too Low", "📉 Go LOWER!"
+            return "Too High", "📉 Go LOWER!"
+        return "Too Low", "📈 Go HIGHER!"
 
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
-    if outcome == "Win":
+    if outcome == "Win": 
         points = 100 - 10 * (attempt_number + 1)
         if points < 10:
             points = 10
         return current_score + points
 
-    if outcome == "Too High":
-        if attempt_number % 2 == 0:
-            return current_score + 5
+    if outcome == "Too High": # FIXME: Logic break, no point point should be rewared and even/odd number check should be removed, as supposed by Claud and verified by me
         return current_score - 5
-
-    if outcome == "Too Low":
+    if outcome == "Too Low": # FIXME: Logic break, no point rewared for quessing right as supposed by Claude and verified by me
         return current_score - 5
 
     return current_score
@@ -118,21 +115,22 @@ with st.expander("Developer Debug Info"):
     st.write("Difficulty:", difficulty)
     st.write("History:", st.session_state.history)
 
-raw_guess = st.text_input(
-    "Enter your guess:",
-    key=f"guess_input_{difficulty}"
-)
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    submit = st.button("Submit Guess 🚀")
+with st.form("guess_form"):
+    raw_guess = st.text_input( # FIXME, found by me where enter din't submit guess.
+        "Enter your guess:",
+        key=f"guess_input_{difficulty}"
+    )
+    submit = st.form_submit_button("Submit Guess 🚀")
+col2, col3 = st.columns(2)
 with col2:
     new_game = st.button("New Game 🔁")
 with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
-if new_game:
+if new_game: # FIXME, another issue found me, and suggested fix by claud to update status, and add history reset
     st.session_state.attempts = 0
+    st.session_state.status = "playing"
+    st.session_state.history = []
     st.session_state.secret = random.randint(1, 100)
     st.success("New game started.")
     st.rerun()
@@ -155,8 +153,8 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        if st.session_state.attempts % 2 == 0:
-            secret = str(st.session_state.secret)
+        if st.session_state.attempts % 2 == 0: #FIXME: Logic break here, secret number was secretly converted to a string as supposed by Claude, and verified by me
+            secret = st.session_state.secret # Removed str()
         else:
             secret = st.session_state.secret
 
